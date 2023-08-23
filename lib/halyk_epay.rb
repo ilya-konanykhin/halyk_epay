@@ -1,6 +1,7 @@
-require "halyk_epay/version"
+# frozen_string_literal: true
+
+require 'halyk_epay/token'
 
 module HalykEpay
-  class Error < StandardError; end
-  # Your code goes here...
+  class BadRequestError < StandardError; end
 end
