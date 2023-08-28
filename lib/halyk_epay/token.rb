@@ -6,6 +6,8 @@ module HalykEpay
     SCOPE = 'webapi usermanagement email_send verification statement statistics payment'
     GRANT_TYPE = 'client_credentials'
 
+    class BadRequestError < StandardError; end
+
     attr_accessor :params
 
     def initialize(params = {})

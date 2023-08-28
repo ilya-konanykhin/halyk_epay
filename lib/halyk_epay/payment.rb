@@ -4,6 +4,8 @@ module HalykEpay
   class Payment
     URL = 'https://epay-api.homebank.kz/'
 
+    class BadRequestError < StandardError; end
+
     attr_accessor :token, :id
 
     def initialize(token, id)

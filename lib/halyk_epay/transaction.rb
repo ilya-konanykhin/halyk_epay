@@ -9,6 +9,8 @@ module HalykbankEpay
     RETRY_REQUEST_STATUS = 107
     FAILED_TRANSACTION_STATUS = %w(REJECT 3D FAILED CANCEL_OLD CANCEL)
 
+    class BadRequestError < StandardError; end
+
     attr_accessor :data
 
     def initialize(data)
