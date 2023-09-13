@@ -1,39 +1,103 @@
-# HalykEpay
+# gem для работы с HalykBank ePay
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/halyk_epay`. To experiment with that code, run `bin/console` for an interactive prompt.
+Gem для работы с платежным шлюзом HalykBank ePay 2.0 для использования в проектах, использующих Ruby (Ruby On Rails, Sinatra и др.).
 
-TODO: Delete this and the text above, and describe your gem
+## Установка
 
-## Installation
+Добавьте эту строку в ваш Gemfile:
 
-Add this line to your application's Gemfile:
+    gem 'halyk_epay'
 
-```ruby
-gem 'halyk_epay'
-```
-
-And then execute:
+Затем установите gem, используя bundler:
 
     $ bundle
 
-Or install it yourself as:
+Или выполните команду:
 
     $ gem install halyk_epay
 
-## Usage
+## Использование (примеры с использованием Ruby On Rails)
 
-TODO: Write usage instructions here
+### Настройка
 
-## Development
+Для использования гема его нужно предварительно настроить. Например, можно создать файл
+`config/initializers/halyk_epay.rb` с подобным содержимым:
 
-After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+```ruby
+HalykEpay.configure do |c|
+  c.client_id = 'Some Client'
+  c.client_secret = 'yF587AV9Ms94qN2QShFzVR3vFnWkhjbAK3sG'
+  c.terminal_id = '67e34d63-102f-4bd1-898e-370781d0074d'
+end
+```
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+Все эти данные вам будут выданы при регистрации.
 
-## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/halyk_epay.
+### Получить токен
 
-## License
+```ruby
+token_params = {
+    invoiceID: 		"000000001",
+    amount: 		100,
+    ...,
+}
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+token = HalykEpay::Token.new(token_params).receive
+
+```
+
+* Базовые параметры (grant_type, scope, client_id, client_secret) добавлять не нужно.
+
+
+### Платежи
+
+```ruby
+HalykEpay::Payment.new(token, id)
+```
+
+* при получении данных о платеже id - это номер заказа
+** в остальных случаях id - это id транзакции который вы получили ранее в postlink после удачной оплаты или при запросе статуса оплаты
+
+
+#### Получение данных о платеже (статуса оплаты)
+
+```ruby
+payment.receive
+
+# код ответа при получении транзакции
+payment.code
+
+# сообщение в ответе при получении транзакции
+payment.message
+
+# данные и транзакции
+payment.transaction_data
+
+# операция в процессе выполнения
+payment.in_progress?
+
+# операция успешна
+payment.success?
+
+# операция провалена
+payment.failed?
+
+# списана ли оплата
+payment.amount_charged?
+
+```
+
+#### Подтверждение оплаты*
+
+```ruby
+payment.charge
+```
+
+#### Отмена оплаты*
+
+```ruby
+payment.cancel
+```
+
+* для подтверждения/отмены платежа необходимо чтобы оплата находилась в статусе Auth.
