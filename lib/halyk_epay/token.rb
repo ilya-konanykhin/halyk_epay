@@ -2,7 +2,8 @@
 
 module HalykEpay
   class Token
-    URL = 'https://epay-oauth.homebank.kz'
+    URL = 'https://epay-oauth.homebank.kz/oauth2/token'
+    TEST_URL = 'https://testoauth.homebank.kz/epay2/oauth2/token'
     SCOPE = 'webapi usermanagement email_send verification statement statistics payment'
     GRANT_TYPE = 'client_credentials'
 
@@ -17,7 +18,7 @@ module HalykEpay
     def receive
       response = RestClient::Request.execute(
         method: :post,
-        url: URL + '/oauth2/token',
+        url: HalykEpay.test_mode? ? TEST_URL : URL,
         payload: base_token_params.merge(params),
         headers: { content_type: 'multipart/form-data' }
       )

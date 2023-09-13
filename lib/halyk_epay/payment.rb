@@ -1,4 +1,4 @@
-# frozen_string_literal: true
+require 'halyk_epay/transaction'
 
 module HalykEpay
   class Payment
@@ -25,17 +25,13 @@ module HalykEpay
       api_request("operation/#{id}/cancel")
     end
 
-    def refund
-      api_request("operation/#{id}/refund")
-    end
-
     private
 
     def api_request(path)
       responce = RestClient::Request.execute(
         method: :post,
         url: URL + path,
-        headers: { Authorization: 'Bearer ' + token }
+        headers: { Authorization: 'Bearer ' + token['access_token'] }
       )
       JSON.parse(responce.body)
     rescue RestClient::ExceptionWithResponse => e

@@ -1,12 +1,10 @@
-# frozen_string_literal: true
-
-module HalykbankEpay
+module HalykEpay
   class Transaction
-    SUCCESS_AMOUNT_STATUS = 'CHARGE'
-    BLOCK_AMOUNT_STATUS = 'AUTH'
-    DEBITED_AMOUNT_STATUS = 'CHARGE'
+    SUCCESS_REQUEST_CODE = 100
+    INITIAL_REQUEST_CODE = 107
+    SUCCESS_AMOUNT_STATUS = 'AUTH'
+    CHARGE_AMOUNT_STATUS = 'CHARGE'
     INITIAL_TRANSACTION_STATUS = 'NEW'
-    RETRY_REQUEST_STATUS = 107
     FAILED_TRANSACTION_STATUS = %w(REJECT 3D FAILED CANCEL_OLD CANCEL)
 
     class BadRequestError < StandardError; end
@@ -17,38 +15,32 @@ module HalykbankEpay
       @data = data
     end
 
-    def status
-      data['transaction']['statusName']
+    def code
+      data['resultCode']
+    end
+
+    def message
+      data['resultMessage']
+    end
+
+    def transaction_data
+      data['transaction'] || {}
+    end
+
+    def in_progress?
+      code == INITIAL_REQUEST_CODE || transaction_data['statusName'] == INITIAL_TRANSACTION_STATUS
     end
 
     def success?
-      data['transaction'] && data['transaction']['statusName'] == SUCCESS_AMOUNT_STATUS
+      code == SUCCESS_REQUEST_CODE && [SUCCESS_AMOUNT_STATUS, CHARGE_AMOUNT_STATUS].include?(transaction_data['statusName'])
     end
 
     def failed?
-      data['transaction'] && FAILED_TRANSACTION_STATUS.include?(data['transaction']['statusName'])
+      FAILED_TRANSACTION_STATUS.include?(transaction_data['statusName'])
     end
 
-    def retry_late?
-      data['resultCode'] == RETRY_REQUEST_STATUS || (data['transaction'] && data['transaction']['statusName'] == INITIAL_TRANSACTION_STATUS)
-    end
-
-    def can_confirm?
-      can_update?
-    end
-
-    def can_cancel?
-      can_update?
-    end
-
-    def can_refund?
-      data['transaction'] && data['transaction']['statusName'] == DEBITED_AMOUNT_STATUS
-    end
-
-    private
-
-    def can_update?
-      data['transaction'] && data['transaction']['statusName'] == BLOCK_AMOUNT_STATUS
+    def amount_charged?
+      transaction_data['statusName'] == CHARGE_AMOUNT_STATUS
     end
   end
 end
