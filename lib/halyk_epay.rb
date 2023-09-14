@@ -12,6 +12,7 @@ module HalykEpay
     client_id: "test",
     client_secret: "yF587AV9Ms94qN2QShFzVR3vFnWkhjbAK3sG",
     terminal_id: '67e34d63-102f-4bd1-898e-370781d0074d',
+    test_mode?: true,
   }.freeze
 
   module Configurator

@@ -1,5 +1,6 @@
 module HalykEpay
   class Transaction
+    URL = 'https://epay-api.homebank.kz/'
     SUCCESS_REQUEST_CODE = 100
     INITIAL_REQUEST_CODE = 107
     SUCCESS_AMOUNT_STATUS = 'AUTH'
@@ -9,10 +10,11 @@ module HalykEpay
 
     class BadRequestError < StandardError; end
 
-    attr_accessor :data
+    attr_accessor :data, :token
 
-    def initialize(data)
-      @data = data
+    def initialize(token, id)
+      @token = token
+      @data = api_request("check-status/payment/transaction/#{id}")
     end
 
     def code
@@ -41,6 +43,19 @@ module HalykEpay
 
     def amount_charged?
       transaction_data['statusName'] == CHARGE_AMOUNT_STATUS
+    end
+
+    private
+
+    def api_request(path)
+      responce = RestClient::Request.execute(
+        method: :get,
+        url: URL + path,
+        headers: { Authorization: 'Bearer ' + token['access_token'] }
+      )
+      JSON.parse(responce.body)
+    rescue RestClient::ExceptionWithResponse => e
+      raise BadRequestError, e.response
     end
   end
 end

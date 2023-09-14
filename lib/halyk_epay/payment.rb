@@ -15,38 +15,25 @@ module HalykEpay
       @id = id
     end
 
-    def receive
-      transaction = get_request("https://testepay.homebank.kz/api/check-status/payment/transaction/#{id}")
-      HalykEpay::Transaction.new(transaction)
-    end
-
     def charge
-      post_request("operation/#{id}/charge")
+      api_request("operation/#{id}/charge")
     end
 
     def cancel
-      post_request("operation/#{id}/cancel")
+      api_request("operation/#{id}/cancel")
     end
 
     private
 
-    def api_request(path, method)
+    def api_request(path)
       responce = RestClient::Request.execute(
-        method: method,
+        method: :post,
         url: URL + path,
         headers: { Authorization: 'Bearer ' + token['access_token'] }
       )
       JSON.parse(responce.body)
     rescue RestClient::ExceptionWithResponse => e
       raise BadRequestError, e.response
-    end
-
-    def post_request(path)
-      api_request(path, :post)
-    end
-
-    def get_request(path)
-      api_request(path, :get)
     end
   end
 end
