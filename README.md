@@ -28,10 +28,11 @@ HalykEpay.configure do |c|
   c.client_id = 'Some Client'
   c.client_secret = 'yF587AV9Ms94qN2QShFzVR3vFnWkhjbAK3sG'
   c.terminal_id = '67e34d63-102f-4bd1-898e-370781d0074d'
+  c.test_mode? = false
 end
 ```
 
-Все эти данные вам будут выданы при регистрации.
+*эти данные вам будут выданы при регистрации.
 
 
 ### Получить токен
@@ -47,57 +48,50 @@ token = HalykEpay::Token.new(token_params).receive
 
 ```
 
-* Базовые параметры (grant_type, scope, client_id, client_secret) добавлять не нужно.
+*Базовые параметры (grant_type, scope, client_id, client_secret) добавлять не нужно.
 
 
 ### Платежи
 
-```ruby
-HalykEpay::Payment.new(token, id)
-```
-
-* при получении данных о платеже id - это номер заказа
-** в остальных случаях id - это id транзакции который вы получили ранее в postlink после удачной оплаты или при запросе статуса оплаты
-
-
 #### Получение данных о платеже (статуса оплаты)
 
 ```ruby
-payment.receive
+transaction = HalykEpay::Transaction.new(token, id)
 
 # код ответа при получении транзакции
-payment.code
+transaction.code
 
 # сообщение в ответе при получении транзакции
-payment.message
+transaction.message
 
 # данные и транзакции
-payment.transaction_data
+transaction.transaction_data
 
 # операция в процессе выполнения
-payment.in_progress?
+transaction.in_progress?
 
 # операция успешна
-payment.success?
+transaction.success?
 
 # операция провалена
-payment.failed?
+transaction.failed?
 
 # списана ли оплата
-payment.amount_charged?
+transaction.amount_charged?
 
 ```
 
-#### Подтверждение оплаты*
+#### Подтверждение оплаты**
 
 ```ruby
+payment = HalykEpay::Payment.new(token, id)
+
+# подтверждение оплаты*
 payment.charge
-```
 
-#### Отмена оплаты*
-
-```ruby
+# отмена оплаты*
 payment.cancel
 ```
 
-* для подтверждения/отмены платежа необходимо чтобы оплата находилась в статусе Auth.
+*при получении данных о платеже id - это номер заказа
+**при подтверждении/отмены платежа, id - это id транзакции который вы получили ранее в postlink после удачной оплаты или при запросе статуса оплаты
