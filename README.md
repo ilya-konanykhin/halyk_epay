@@ -32,7 +32,7 @@ HalykEpay.configure do |c|
 end
 ```
 
-*эти данные вам будут выданы при регистрации.
+эти данные вам будут выданы при регистрации.
 
 
 ### Получить токен
@@ -44,11 +44,10 @@ token_params = {
     ...,
 }
 
-token = HalykEpay::Token.new(token_params).receive
-
+HalykEpay::Token.new(token_params).token
 ```
 
-*Базовые параметры (grant_type, scope, client_id, client_secret) добавлять не нужно.
+Базовые параметры (grant_type, scope, client_id, client_secret) добавлять не нужно.
 
 
 ### Платежи
@@ -56,7 +55,7 @@ token = HalykEpay::Token.new(token_params).receive
 #### Получение данных о платеже (статуса оплаты)
 
 ```ruby
-transaction = HalykEpay::Transaction.new(token, id)
+transaction = HalykEpay::Transaction.new(token, id).receive
 
 # код ответа при получении транзакции
 transaction.code
@@ -81,17 +80,18 @@ transaction.amount_charged?
 
 ```
 
-#### Подтверждение оплаты**
+#### Подтверждение оплаты
 
 ```ruby
 payment = HalykEpay::Payment.new(token, id)
 
-# подтверждение оплаты*
+# подтверждение оплаты
 payment.charge
 
-# отмена оплаты*
+# отмена оплаты
 payment.cancel
 ```
 
-*при получении данных о платеже id - это номер заказа
-**при подтверждении/отмены платежа, id - это id транзакции который вы получили ранее в postlink после удачной оплаты или при запросе статуса оплаты
+при получении данных о платеже, id, это номер заказа
+
+при подтверждении/отмены платежа, id, это id транзакции который вы получили ранее в postlink после удачной оплаты или при запросе статуса оплаты
