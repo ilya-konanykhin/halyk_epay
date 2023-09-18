@@ -44,7 +44,13 @@ token_params = {
     ...,
 }
 
-HalykEpay::Token.new(token_params).token
+data = HalykEpay::Token.new(token_params)
+
+# объект токена, все данные полученные от epay по запросу токена
+data.token
+
+# токен - "f2288c2b-1d08-4aac-a210-d62c0901f915"
+data.access_token
 ```
 
 Базовые параметры (grant_type, scope, client_id, client_secret) добавлять не нужно.
