@@ -8,7 +8,7 @@ module HalykEpay
   CONFIGURABLE_ATTRIBUTES = [:client_id, :client_secret, :terminal_id]
 
   DEFAULTS = {
-    # test data
+    # test data - https://epayment.kz/docs/Test%20credentials
     client_id: "test",
     client_secret: "yF587AV9Ms94qN2QShFzVR3vFnWkhjbAK3sG",
     terminal_id: '67e34d63-102f-4bd1-898e-370781d0074d',
@@ -28,7 +28,7 @@ module HalykEpay
       end
       yield self if block_given?
 
-      if (blank = CONFIGURABLE_ATTRIBUTES.map { |att| [att, self.send(att)] }.select{|_, val| val.nil?}).count > 0
+      if (blank = CONFIGURABLE_ATTRIBUTES.map { |att| [att, self.send(att)] }.select{ |_, val| val.nil? }).count > 0
         blank_attribute_names = blank.map { |attr, _| attr }.join(", ")
         raise "Some required attributes left blank: #{blank_attribute_names}"
       end

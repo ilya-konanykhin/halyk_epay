@@ -1,6 +1,7 @@
 module HalykEpay
   class Transaction
     URL = 'https://epay-api.homebank.kz/'
+    TEST_URL = 'https://testepay.homebank.kz/api/'
     SUCCESS_REQUEST_CODE = 100
     INITIAL_REQUEST_CODE = 107
     SUCCESS_AMOUNT_STATUS = 'AUTH'
@@ -10,13 +11,22 @@ module HalykEpay
 
     class BadRequestError < StandardError; end
 
-    attr_accessor :data, :token
+    attr_accessor :data, :token, :id
 
     def initialize(token, id)
       @token = token
+      @id = id
+      @data = {}
+    end
+
+    def receive
       @data = api_request("check-status/payment/transaction/#{id}")
     end
 
+    # Код транзакции показывает успех выполнения запроса. Если в ответ приходит:
+    # - 100, необходимо смотреть поле transaction_data['statusName'] для получения статуса транзакции.
+    # - 107, операция в процессе выполнения, запросить статус позже
+    # В остальных случаях запрос неуспешен. Подробнее - https://epayment.kz/docs/status-tranzakcii
     def code
       data['resultCode']
     end
@@ -48,10 +58,11 @@ module HalykEpay
     private
 
     def api_request(path)
+      url = HalykEpay.test_mode? ? TEST_URL : URL
       responce = RestClient::Request.execute(
         method: :get,
-        url: URL + path,
-        headers: { Authorization: 'Bearer ' + token['access_token'] }
+        url: url + path,
+        headers: {Authorization: 'Bearer ' + token.access_token}
       )
       JSON.parse(responce.body)
     rescue RestClient::ExceptionWithResponse => e

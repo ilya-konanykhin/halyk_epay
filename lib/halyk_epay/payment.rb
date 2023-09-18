@@ -4,7 +4,8 @@ require 'halyk_epay/transaction'
 
 module HalykEpay
   class Payment
-    URL = 'https://epay-api.homebank.kz/'
+    URL = 'https://epay-api.homebank.kz/operation/'
+    TEST_URL = 'https://testepay.homebank.kz/api/operation/'
 
     class BadRequestError < StandardError; end
 
@@ -16,20 +17,21 @@ module HalykEpay
     end
 
     def charge
-      api_request("operation/#{id}/charge")
+      api_request("#{id}/charge")
     end
 
     def cancel
-      api_request("operation/#{id}/cancel")
+      api_request("#{id}/cancel")
     end
 
     private
 
     def api_request(path)
+      url = HalykEpay.test_mode? ? TEST_URL : URL
       responce = RestClient::Request.execute(
         method: :post,
-        url: URL + path,
-        headers: { Authorization: 'Bearer ' + token['access_token'] }
+        url: url + path,
+        headers: {Authorization: 'Bearer ' + token.access_token}
       )
       JSON.parse(responce.body)
     rescue RestClient::ExceptionWithResponse => e
