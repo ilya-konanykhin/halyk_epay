@@ -6,18 +6,26 @@ module HalykEpay
     TEST_URL = 'https://testoauth.homebank.kz/epay2/oauth2/token'
     SCOPE = 'webapi usermanagement email_send verification statement statistics payment'
     GRANT_TYPE = 'client_credentials'
+    TIMEOUT = 10
 
     class BadRequestError < StandardError; end
 
-    attr_accessor :params
+    attr_accessor :token
 
     def initialize(params = {})
-      @params = params
+      @token = api_request(params)
     end
 
-    def receive
+    def access_token
+      token["access_token"]
+    end
+
+    private
+
+    def api_request(params)
       response = RestClient::Request.execute(
         method: :post,
+        timeout: TIMEOUT,
         url: HalykEpay.test_mode? ? TEST_URL : URL,
         payload: base_token_params.merge(params),
         headers: { content_type: 'multipart/form-data' }
@@ -26,8 +34,6 @@ module HalykEpay
     rescue RestClient::ExceptionWithResponse => e
       raise BadRequestError, e.response
     end
-
-    private
 
     def base_token_params
       {
