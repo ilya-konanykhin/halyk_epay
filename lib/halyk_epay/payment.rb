@@ -31,6 +31,7 @@ module HalykEpay
       responce = RestClient::Request.execute(
         method: :post,
         url: url + path,
+        timeout: HalykEpay::TIMEOUT,
         headers: {Authorization: 'Bearer ' + token.access_token}
       )
       JSON.parse(responce.body)

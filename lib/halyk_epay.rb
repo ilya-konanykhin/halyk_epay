@@ -5,6 +5,7 @@ require 'halyk_epay/token'
 require 'halyk_epay/payment'
 
 module HalykEpay
+  TIMEOUT = 10
   CONFIGURABLE_ATTRIBUTES = [:client_id, :client_secret, :terminal_id]
 
   DEFAULTS = {

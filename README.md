@@ -61,7 +61,7 @@ data.access_token
 #### Получение данных о платеже (статуса оплаты)
 
 ```ruby
-transaction = HalykEpay::Transaction.new(token, id).receive
+transaction = HalykEpay::Transaction.new(token, id)
 
 # код ответа при получении транзакции
 transaction.code
