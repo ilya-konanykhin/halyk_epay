@@ -11,16 +11,10 @@ module HalykEpay
 
     class BadRequestError < StandardError; end
 
-    attr_accessor :data, :token, :id
+    attr_accessor :data
 
     def initialize(token, id)
-      @token = token
-      @id = id
-      @data = {}
-    end
-
-    def receive
-      @data = api_request("check-status/payment/transaction/#{id}")
+      @data = api_request("check-status/payment/transaction/#{id}", token)
     end
 
     # Код транзакции показывает успех выполнения запроса. Если в ответ приходит:
@@ -39,28 +33,33 @@ module HalykEpay
       data['transaction'] || {}
     end
 
+    def status_name
+      transaction_data['statusName'] || ''
+    end
+
     def in_progress?
-      code == INITIAL_REQUEST_CODE || transaction_data['statusName'] == INITIAL_TRANSACTION_STATUS
+      code == INITIAL_REQUEST_CODE || status_name == INITIAL_TRANSACTION_STATUS
     end
 
     def success?
-      code == SUCCESS_REQUEST_CODE && [SUCCESS_AMOUNT_STATUS, CHARGE_AMOUNT_STATUS].include?(transaction_data['statusName'])
+      code == SUCCESS_REQUEST_CODE && [SUCCESS_AMOUNT_STATUS, CHARGE_AMOUNT_STATUS].include?(status_name)
     end
 
     def failed?
-      FAILED_TRANSACTION_STATUS.include?(transaction_data['statusName'])
+      [SUCCESS_REQUEST_CODE, INITIAL_REQUEST_CODE].exclude?(code) || FAILED_TRANSACTION_STATUS.include?(status_name)
     end
 
     def amount_charged?
-      transaction_data['statusName'] == CHARGE_AMOUNT_STATUS
+      code == SUCCESS_REQUEST_CODE && status_name == CHARGE_AMOUNT_STATUS
     end
 
     private
 
-    def api_request(path)
+    def api_request(path, token)
       url = HalykEpay.test_mode? ? TEST_URL : URL
       responce = RestClient::Request.execute(
         method: :get,
+        timeout: HalykEpay::TIMEOUT,
         url: url + path,
         headers: {Authorization: 'Bearer ' + token.access_token}
       )
