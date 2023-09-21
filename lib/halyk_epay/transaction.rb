@@ -2,8 +2,8 @@ module HalykEpay
   class Transaction
     URL = 'https://epay-api.homebank.kz/'
     TEST_URL = 'https://testepay.homebank.kz/api/'
-    SUCCESS_REQUEST_CODE = 100
-    INITIAL_REQUEST_CODE = 107
+    SUCCESS_REQUEST_CODE = '100'
+    INITIAL_REQUEST_CODE = '107'
     SUCCESS_AMOUNT_STATUS = 'AUTH'
     CHARGE_AMOUNT_STATUS = 'CHARGE'
     INITIAL_TRANSACTION_STATUS = 'NEW'
