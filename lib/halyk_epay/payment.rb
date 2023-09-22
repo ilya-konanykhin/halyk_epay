@@ -1,7 +1,3 @@
-# frozen_string_literal: true
-
-require 'halyk_epay/transaction'
-
 module HalykEpay
   class Payment
     URL = 'https://epay-api.homebank.kz/operation/'
@@ -27,16 +23,19 @@ module HalykEpay
     private
 
     def api_request(path)
-      url = HalykEpay.test_mode? ? TEST_URL : URL
       responce = RestClient::Request.execute(
         method: :post,
-        url: url + path,
+        url: request_url + path,
         timeout: HalykEpay::TIMEOUT,
         headers: {Authorization: 'Bearer ' + token.access_token}
       )
       JSON.parse(responce.body)
     rescue RestClient::ExceptionWithResponse => e
       raise BadRequestError, e.response
+    end
+
+    def request_url
+      HalykEpay.test_mode? ? TEST_URL : URL
     end
   end
 end

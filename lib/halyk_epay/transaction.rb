@@ -56,18 +56,19 @@ module HalykEpay
     private
 
     def api_request(path, token)
-      url = HalykEpay.test_mode? ? TEST_URL : URL
       responce = RestClient::Request.execute(
         method: :get,
         timeout: HalykEpay::TIMEOUT,
-        url: url + path,
+        url: request_url + path,
         headers: {Authorization: 'Bearer ' + token.access_token}
       )
       JSON.parse(responce.body)
     rescue RestClient::ExceptionWithResponse => e
       raise BadRequestError, e.response
     end
+
+    def request_url
+      HalykEpay.test_mode? ? TEST_URL : URL
+    end
   end
 end
-
-

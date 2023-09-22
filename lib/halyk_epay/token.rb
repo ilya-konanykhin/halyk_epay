@@ -25,7 +25,7 @@ module HalykEpay
       response = RestClient::Request.execute(
         method: :post,
         timeout: HalykEpay::TIMEOUT,
-        url: HalykEpay.test_mode? ? TEST_URL : URL,
+        url: request_url,
         payload: base_token_params.merge(params),
         headers: { content_type: 'multipart/form-data' }
       )
@@ -41,6 +41,10 @@ module HalykEpay
         client_id: HalykEpay.client_id,
         client_secret: HalykEpay.client_secret,
       }
+    end
+
+    def request_url
+      HalykEpay.test_mode? ? TEST_URL : URL
     end
   end
 end

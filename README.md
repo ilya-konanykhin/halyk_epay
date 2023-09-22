@@ -55,7 +55,6 @@ data.access_token
 
 Базовые параметры (grant_type, scope, client_id, client_secret) добавлять не нужно.
 
-
 ### Платежи
 
 #### Получение данных о платеже (статуса оплаты)
