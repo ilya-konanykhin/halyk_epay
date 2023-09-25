@@ -27,7 +27,7 @@ module HalykEpay
         timeout: HalykEpay::TIMEOUT,
         url: request_url,
         payload: base_token_params.merge(params),
-        headers: { content_type: 'multipart/form-data' }
+        headers: {content_type: 'multipart/form-data'}
       )
       JSON.parse(response.body)
     rescue RestClient::ExceptionWithResponse => e
