@@ -23,13 +23,12 @@ module HalykEpay
     private
 
     def api_request(path)
-      responce = RestClient::Request.execute(
+      RestClient::Request.execute(
         method: :post,
         url: request_url + path,
         timeout: HalykEpay::TIMEOUT,
         headers: {Authorization: 'Bearer ' + token.access_token}
       )
-      JSON.parse(responce.body)
     rescue RestClient::ExceptionWithResponse => e
       raise BadRequestError, e.response
     end

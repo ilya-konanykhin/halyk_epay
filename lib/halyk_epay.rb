@@ -3,6 +3,8 @@
 require "halyk_epay/version"
 require 'halyk_epay/token'
 require 'halyk_epay/payment'
+require 'halyk_epay/transaction'
+require 'rest-client'
 
 module HalykEpay
   TIMEOUT = 10
