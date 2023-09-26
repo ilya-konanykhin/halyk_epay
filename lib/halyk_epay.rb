@@ -45,4 +45,5 @@ module HalykEpay
   end
 
   extend Configurator
+  extend self
 end
